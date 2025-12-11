@@ -1,0 +1,3048 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Quiz Game</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+        /* Daha parlaq rənglər və Glass Effect Dizayn - MOBİL UYUMLU */
+        :root {
+            --primary-blue: #4361ee;
+            --secondary-blue: #3a0ca3;
+            --accent-pink: #f72585;
+            --accent-yellow: #ffd166;
+            --accent-green: #06d6a0;
+            --accent-purple: #7209b7;
+            --light-bg: #f8f9ff;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-color: rgba(67, 97, 238, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 25%, #7209b7 50%, #f72585 75%, #ffd166 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Circles Background - DAHA KİÇİK */
+        .floating-circles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(30px);
+            opacity: 0.25;
+            animation: float 30s infinite linear;
+        }
+        
+        .circle:nth-child(1) {
+            width: 150px;
+            height: 150px;
+            background: var(--accent-pink);
+            top: 10%;
+            left: 5%;
+            animation-duration: 35s;
+        }
+        
+        .circle:nth-child(2) {
+            width: 180px;
+            height: 180px;
+            background: var(--primary-blue);
+            top: 60%;
+            right: 5%;
+            animation-duration: 40s;
+            animation-direction: reverse;
+        }
+        
+        .circle:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            background: var(--accent-yellow);
+            bottom: 10%;
+            left: 15%;
+            animation-duration: 30s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30px, 20px) rotate(90deg); }
+            50% { transform: translate(0, 40px) rotate(180deg); }
+            75% { transform: translate(-30px, 20px) rotate(270deg); }
+        }
+
+        /* Glass Container - DAHA KİÇİK */
+        .glass-container {
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            box-shadow: 
+                0 10px 30px var(--shadow-color),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+            margin: 5px auto;
+            padding: 15px;
+        }
+
+        .glass-card {
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 14px;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            padding: 18px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            padding: 8px;
+        }
+
+        /* HEADER - YAN-YANA FLEX DÜZENİ (ƏSAS DƏYİŞİKLİK) */
+        .quiz-header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            width: 100%;
+            backdrop-filter: blur(8px) saturate(180%);
+            -webkit-backdrop-filter: blur(8px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .header-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(67, 97, 238, 0.1);
+        }
+
+        .header-label {
+            font-size: 0.65rem;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .header-value {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--secondary-blue);
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            width: 100%;
+            line-height: 1.2;
+        }
+
+        #username-display {
+            color: var(--accent-pink);
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        #question-counter {
+            color: var(--primary-blue);
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        #timer-display {
+            color: var(--accent-pink);
+            font-family: 'Poppins', monospace;
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        /* Start Container - DAHA KİÇİK */
+        .start-container {
+            text-align: center;
+            padding: 25px 18px;
+        }
+
+        .start-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink), var(--accent-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .start-subtitle {
+            font-size: 0.9rem;
+            color: var(--secondary-blue);
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        .user-info {
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--secondary-blue);
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+        }
+
+        /* Question Container */
+        .question-container {
+            margin-bottom: 15px;
+            padding: 18px;
+        }
+
+        .question {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-weight: 600;
+            color: var(--secondary-blue);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        /* Options - DAHA KİÇİK */
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1.5px solid rgba(67, 97, 238, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: var(--secondary-blue);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(67, 97, 238, 0.1);
+            transform: translateX(3px);
+            border-color: var(--primary-blue);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .option-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 8px;
+            margin-right: 12px;
+            font-weight: bold;
+            color: white;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            min-width: 28px;
+        }
+
+        /* Answer States */
+        .option-btn.correct {
+            background: linear-gradient(135deg, rgba(6, 214, 160, 0.12), rgba(6, 214, 160, 0.2));
+            border-color: var(--accent-green);
+            color: #0a8754;
+            animation: pulse-green 0.5s ease-in-out;
+        }
+
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, rgba(247, 37, 133, 0.12), rgba(247, 37, 133, 0.2));
+            border-color: var(--accent-pink);
+            color: #b5174e;
+            animation: pulse-red 0.5s ease-in-out;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.3); }
+            70% { box-shadow: 0 0 0 8px rgba(6, 214, 160, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.3); }
+            70% { box-shadow: 0 0 0 8px rgba(247, 37, 133, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+        }
+
+        /* Timer - DAHA KİÇİK */
+        .timer-container {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 3px;
+            margin: 15px 0 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-pink), var(--accent-yellow));
+            width: 100%;
+            transition: width 1s linear;
+            border-radius: 3px;
+        }
+
+        /* Buttons - DAHA KİÇİK */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            font-size: 0.95rem;
+            padding: 14px 25px;
+            margin-top: 12px;
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.25);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.35);
+        }
+
+        .btn-start:active {
+            transform: translateY(0);
+        }
+
+        /* Controls - YENİ FLEX DÜZENİ */
+        .controls-bottom {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1.5px solid rgba(67, 97, 238, 0.3);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: scale(1.05);
+            border-color: var(--primary-blue);
+        }
+
+        #next-btn {
+            flex: 1;
+            max-width: none;
+            width: auto;
+            margin: 0;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Result Container - DAHA KİÇİK */
+        .result-container {
+            text-align: center;
+            display: none;
+            padding: 25px 18px;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .score {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 18px;
+            border-radius: 14px;
+            display: inline-block;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .progress {
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: var(--secondary-blue);
+            font-weight: 600;
+        }
+
+        /* Auto Next Message */
+        .auto-next-message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeInOut 1.2s ease-in-out;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            display: inline-block;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.01); }
+        }
+
+        /* Progress Circles - DAHA KİÇİK */
+        .progress-circles {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            padding: 0 8px;
+        }
+
+        .progress-circle {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .progress-circle.active {
+            background: var(--primary-blue);
+            transform: scale(1.3);
+        }
+
+        .progress-circle.correct {
+            background: var(--accent-green);
+        }
+
+        .progress-circle.incorrect {
+            background: var(--accent-pink);
+        }
+
+        /* Particles - AZALDIRILMIŞ */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: floatParticle 25s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* ========== MEDIA QUERIES ========== */
+        /* MOBİL ÜÇÜN TƏNZİMLƏMƏ */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                align-items: flex-start;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+
+            .container {
+                padding: 5px;
+            }
+
+            .glass-container {
+                border-radius: 16px;
+                padding: 12px;
+                margin: 3px auto;
+            }
+
+            /* HEADER MOBİL ÜÇÜN */
+            .quiz-header {
+                padding: 10px 12px;
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+            
+            .header-item {
+                padding: 6px 8px;
+            }
+            
+            .header-label {
+                font-size: 0.6rem;
+                margin-bottom: 3px;
+            }
+            
+            .header-value {
+                font-size: 0.85rem;
+            }
+            
+            #username-display,
+            #question-counter,
+            #timer-display {
+                font-size: 0.85rem;
+            }
+
+            .start-title {
+                font-size: 1.4rem;
+                margin-bottom: 10px;
+            }
+
+            .start-subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 15px;
+            }
+
+            .question {
+                font-size: 0.95rem;
+                padding: 14px;
+                margin-bottom: 15px;
+                line-height: 1.3;
+            }
+
+            .option-btn {
+                padding: 12px 14px;
+                font-size: 0.85rem;
+                line-height: 1.2;
+            }
+
+            .option-letter {
+                width: 26px;
+                height: 26px;
+                font-size: 0.8rem;
+                margin-right: 10px;
+                min-width: 26px;
+            }
+
+            .btn {
+                padding: 11px 18px;
+                font-size: 0.85rem;
+                max-width: 260px;
+            }
+
+            .btn-start {
+                padding: 12px 22px;
+                font-size: 0.9rem;
+            }
+
+            .result-title {
+                font-size: 1.4rem;
+                margin-bottom: 15px;
+            }
+
+            .score {
+                font-size: 1.3rem;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .controls-bottom {
+                margin-top: 15px;
+                padding-top: 12px;
+                gap: 12px;
+            }
+
+            .icon-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+
+            #next-btn {
+                padding: 11px 18px;
+                font-size: 0.85rem;
+            }
+
+            .timer-container {
+                margin: 12px 0 15px;
+            }
+
+            .progress-circles {
+                gap: 4px;
+                margin-top: 10px;
+            }
+
+            .progress-circle {
+                width: 7px;
+                height: 7px;
+            }
+        }
+
+        /* Çox kiçik ekranlar üçün */
+        @media (max-width: 360px) {
+            .quiz-header {
+                gap: 4px;
+                padding: 8px 10px;
+            }
+            
+            .header-label {
+                font-size: 0.55rem;
+                margin-bottom: 2px;
+                letter-spacing: 0.3px;
+            }
+            
+            .header-value {
+                font-size: 0.8rem;
+            }
+            
+            .header-item {
+                padding: 5px 7px;
+            }
+            
+            #username-display,
+            #question-counter,
+            #timer-display {
+                font-size: 0.8rem;
+            }
+
+            .start-title {
+                font-size: 1.3rem;
+            }
+
+            .question {
+                font-size: 0.9rem;
+                padding: 12px;
+            }
+
+            .option-btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            .option-letter {
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+                margin-right: 8px;
+                min-width: 24px;
+            }
+        }
+
+        /* Tablet üçün */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .glass-container {
+                max-width: 420px;
+                padding: 18px;
+            }
+
+            .quiz-header {
+                padding: 15px;
+                gap: 12px;
+            }
+
+            .header-label {
+                font-size: 0.7rem;
+            }
+
+            .header-value {
+                font-size: 1rem;
+            }
+
+            #username-display,
+            #question-counter,
+            #timer-display {
+                font-size: 1rem;
+            }
+
+            .start-title {
+                font-size: 1.8rem;
+            }
+
+            .question {
+                font-size: 1.1rem;
+            }
+
+            .option-btn {
+                font-size: 0.95rem;
+                padding: 15px 18px;
+            }
+        }
+
+        /* Desktop üçün */
+        @media (min-width: 769px) {
+            body {
+                align-items: center;
+                padding: 20px;
+            }
+
+            .glass-container {
+                max-width: 500px;
+                padding: 20px;
+            }
+
+            .quiz-header {
+                gap: 15px;
+            }
+
+            .controls-bottom {
+                gap: 20px;
+            }
+        }
+
+        /* Landscape rejimi üçün */
+        @media (max-width: 768px) and (orientation: landscape) {
+            body {
+                padding: 5px;
+                align-items: flex-start;
+            }
+
+            .glass-container {
+                max-width: 98%;
+                margin: 3px auto;
+                padding: 10px;
+            }
+
+            .quiz-header {
+                padding: 10px;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .header-label {
+                font-size: 0.5rem;
+            }
+
+            .header-value {
+                font-size: 0.75rem;
+            }
+
+            #username-display,
+            #question-counter,
+            #timer-display {
+                font-size: 0.75rem;
+            }
+
+            .start-container {
+                padding: 15px 10px;
+            }
+
+            .question-container {
+                padding: 12px;
+            }
+
+            .options-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .option-btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                min-height: 60px;
+            }
+
+            .option-letter {
+                width: 22px;
+                height: 22px;
+                font-size: 0.75rem;
+                margin-right: 8px;
+            }
+
+            .controls-bottom {
+                margin-top: 12px;
+                padding-top: 10px;
+                gap: 10px;
+            }
+
+            .question {
+                font-size: 0.9rem;
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+        }
+
+        /* Yüksək ekranlar üçün */
+        @media (min-height: 800px) and (max-width: 480px) {
+            .glass-container {
+                margin-top: 20px;
+            }
+        }
+
+        /* Aşağı scroll problemi üçün */
+        .quiz-container {
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-container {
+            flex: 1;
+        }
+
+        /* Header-in yan-yana olmasını təmin etmək üçün əlavə CSS */
+        .quiz-header {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .header-item {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background -->
+    <div class="floating-circles">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+    
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Main Container -->
+    <div class="container glass-container">
+        <!-- Start Screen -->
+        <div class="start-container" id="start-container">
+            <h1 class="start-title">🌟 PREMIUM QUIZ 🌟</h1>
+            <p class="start-subtitle">Bilik sınağınıza xoş gəldiniz!</p>
+            
+            <div class="user-info glass-card">
+                <i class="fas fa-user-circle" style="font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px;"></i>
+                <p id="user-greeting">Siz artıq giriş etmisiniz!</p>
+                <p style="font-size: 1rem; color: var(--accent-pink); margin-top: 10px;">
+                    <i class="fas fa-shield-alt"></i> Avtomatik giriş aktivdir
+                </p>
+            </div>
+            
+            <button class="btn btn-start" id="start-btn">
+                <i class="fas fa-play-circle" style="margin-right: 10px;"></i>KVİZƏ BAŞLA
+            </button>
+        </div>
+        
+        <!-- Quiz Header -->
+        <div class="quiz-header glass-card" id="quiz-header" style="display: none;">
+            <div class="header-item">
+                <div class="header-label">İSTİFADƏÇİ</div>
+                <div class="header-value" id="username-display">Qonaq</div>
+            </div>
+            <div class="header-item">
+                <div class="header-label">SUAL</div>
+                <div class="header-value" id="question-counter">1/250</div>
+            </div>
+            <div class="header-item">
+                <div class="header-label">VAXT</div>
+                <div class="header-value" id="timer-display">40s</div>
+            </div>
+        </div>
+        
+        <!-- Quiz Container -->
+        <div class="quiz-container" id="quiz-container" style="display: none;">
+            <!-- Progress Circles -->
+            <div class="progress-circles" id="progress-circles"></div>
+            
+            <!-- Progress Text -->
+            <div class="progress" id="progress">Sual 1 / 250</div>
+            
+            <!-- Timer -->
+            <div class="timer-container">
+                <div class="timer-bar" id="timer-bar"></div>
+            </div>
+            
+            <!-- Question -->
+            <div class="question-container glass-card">
+                <div class="question" id="question">Sual yüklənir...</div>
+                
+                <!-- Options -->
+                <div class="options-container" id="options-container"></div>
+                
+                <!-- Auto Next Message -->
+                <div class="auto-next-message" id="auto-next-message" style="display: none;"></div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls-bottom">
+                <button class="btn btn-start" id="next-btn" style="display: none;">
+                    <i class="fas fa-forward" style="margin-right: 8px;"></i>NÖVBƏTİ SUAL
+                </button>
+                <div class="icon-btn" id="timer-toggle-btn" title="Vaxtı Dayandır/Davam et">
+                    <i class="fas fa-pause"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Result Container -->
+        <div class="result-container" id="result-container">
+            <h2 class="result-title">🎉 KVIZ TAMAMLANDI! 🎉</h2>
+            
+            <div class="score" id="score"></div>
+            
+            <!-- Stats -->
+            <div class="glass-card" style="padding: 30px; margin: 30px auto; max-width: 500px;">
+                <h3 style="color: var(--primary-blue); margin-bottom: 20px; font-size: 1.5rem;">
+                    <i class="fas fa-chart-bar" style="margin-right: 10px;"></i>STATİSTİKA
+                </h3>
+                <div id="stats-details" style="text-align: left; line-height: 2;">
+                    <!-- Stats will be inserted here -->
+                </div>
+            </div>
+            
+            <button class="btn btn-start" id="restart-btn">
+                <i class="fas fa-redo" style="margin-right: 10px;"></i>YENİDƏN BAŞLA
+            </button>
+        </div>
+    </div>
+
+<script>
+  
+const allQuestions = [
+  {
+    "question_number": 1,
+    "question_text": "Statistikanın meydana gəlməsinin əsas səbəbi nə olmuşdur?",
+    "options": {
+      "a": "Əhali artımının sürətlənməsi",
+      "b": "İnsanların tələbatı",
+      "c": "Kənd təsərrüfatının inkişafı",
+      "d": "Dövlətin göstərişi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 2,
+    "question_text": "Statistikanın kökləri hansı dövrlərə gedib çıxır?",
+    "options": {
+      "a": "Orta əsrlərə",
+      "b": "Yeni dövrə",
+      "c": "Qədim dövrlərə",
+      "d": "XIX əsrə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 3,
+    "question_text": "Eramızdan iki min il əvvəl statistika sahəsində hansı ölkədə məlumat toplanmışdır?",
+    "options": {
+      "a": "Misirdə",
+      "b": "Çində",
+      "c": "Hindistanda",
+      "d": "Yunanıstanda"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 4,
+    "question_text": "Qədim Çində əhalinin sayı hansı meyarlara görə hesablanmışdır?",
+    "options": {
+      "a": "Qan qruplarına və etnik mənsubiyyətə görə",
+      "b": "Yaşına və vətəndaşlığına görə",
+      "c": "Cinsinə və yaşına görə",
+      "d": "Ailə tərkibinə və gəlirinə görə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 5,
+    "question_text": "Qədim Çində statistik məlumatlar hansı sahələri əhatə edirdi?",
+    "options": {
+      "a": "Yalnız sənaye",
+      "b": "Siyasi idarəetmə",
+      "c": "Məhsuldar qüvvələr və kənd təsərrüfatı",
+      "d": "Təhsil və səhiyyə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 6,
+    "question_text": "Qədim Romada statistik tədqiqatlar hansı məqsədlə aparılırdı?",
+    "options": {
+      "a": "Dini məqsədlərlə",
+      "b": "Hərbi xidmət üçün",
+      "c": "Əhalinin sayı və əmlakın qeydiyyatı üçün",
+      "d": "Vergi yığımı üçün"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 7,
+    "question_text": "Qədim Romada vətəndaşlar haqqında hansı məlumatlar toplanırdı?",
+    "options": {
+      "a": "Onların dini inancı",
+      "b": "Onların təhsil səviyyəsi",
+      "c": "Sahib olduqları əmlak",
+      "d": "Seçki hüquqları"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 8,
+    "question_text": "Statistikanın bir elm kimi formalaşmasına hansı amil mühüm təsir göstərmişdir?",
+    "options": {
+      "a": "Əhalinin artımı",
+      "b": "Dövlət idarəçiliyi",
+      "c": "Ticarət və beynəlxalq əmtəə-pul münasibətləri",
+      "d": "Kənd təsərrüfatının zəifləməsi"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 9,
+    "question_text": "Statistik məlumatların toplanmasına nə vaxt başlanmışdır?",
+    "options": {
+      "a": "Yalnız orta əsrlərdə",
+      "b": "Yeni dövrdə",
+      "c": "Qədim zamanlarda",
+      "d": "XIX əsrdən sonra"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 10,
+    "question_text": "Statistik məlumatların təhlil və işlənməsi nə vaxt həyata keçirilmişdir?",
+    "options": {
+      "a": "Toplandığı andan dərhal sonra",
+      "b": "Həmişə toplanma ilə eyni vaxtda",
+      "c": "Daha sonralar",
+      "d": "Qədim dövrlərdə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 11,
+    "question_text": "Aşağıdakılardan hansı statistikanın bir elm kimi formalaşmasının gec baş verməsinin səbəbidir?",
+    "options": {
+      "a": "İnsanların tənbəlliyi",
+      "b": "Statistikanın yalnız dövlətlərə lazım olması",
+      "c": "Məlumatların sadəcə toplanması, lakin işlənməməsi",
+      "d": "Əhalinin azlığı"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 12,
+    "question_text": "Statistik təhlil və işlənmə prosesinin yaranması nə ilə bağlıdır?",
+    "options": {
+      "a": "Məlumatların toplanmaması ilə",
+      "b": "İqtisadi sistemin zəifləməsi ilə",
+      "c": "Toplanmış məlumatlara elmi yanaşmanın artması ilə",
+      "d": "Tarixi faktların yoxluğu ilə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 13,
+    "question_text": "Statistika sözünün mənası ilə bağlı ilk dəfə nə vaxt fikir bildirilmişdir?",
+    "options": {
+      "a": "1649-cu ildə",
+      "b": "1749-cu ildə",
+      "c": "1849-cu ildə",
+      "d": "1949-cu ildə"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 14,
+    "question_text": "Statistika sözünün ilkin mənası nə olmuşdur?",
+    "options": {
+      "a": "İqtisadi inkişafın müxtəlif sahələr üzrə göstəricilərini təhlil etmək",
+      "b": "Əhali artımı və demoqrafik dəyişiklikləri sistemli şəkildə qeyd etmək",
+      "c": "\"Staten Kunde\" -- dövlətşünaslıq (dövlətin qüdrətinin təsviri)",
+      "d": "Ticarət statistikası və iqtisadi fəaliyyətin təhlili üçün məlumatları toplamaq"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 15,
+    "question_text": "Statistika sözünün ilkin mənasının uzun müddət necə başa düşüldüyü göstərilir?",
+    "options": {
+      "a": "Maliyyə hesabatları üçün vasitə",
+      "b": "Dövlətin qüdrətini mətnlə təsvir etmək vasitəsi",
+      "c": "Əhali sayını hesablamaq üçün üsul",
+      "d": "Elmi tədqiqatların əsas hissəsi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 16,
+    "question_text": "Statistika sözünün mənası ilə bağlı neçə fikir olduğu göstərilir?",
+    "options": {
+      "a": "Yüzdən çox",
+      "b": "İki yüzə yaxın",
+      "c": "Beş yüzə yaxın",
+      "d": "Minə yaxın"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 17,
+    "question_text": "Aşağıdakılardan hansı statistikaya dair fikirlər səsləndirən qruplardan biri deyildir?",
+    "options": {
+      "a": "Filosoflar",
+      "b": "Riyaziyyatçılar",
+      "c": "Kimyaçılar",
+      "d": "Sosioloqlar"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 19,
+    "question_text": "\"Statistika\" termini hansı dillərdəki sözlərdən yaranmışdır?",
+    "options": {
+      "a": "Fransızca, İngiliscə, Latınca",
+      "b": "İtalyanca, Almanca, Latınca",
+      "c": "Yunan, Rus və Latınca",
+      "d": "İspan, Alman və Fransızca"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 20,
+    "question_text": "Statistika sözünün əsas mənası nədir?",
+    "options": {
+      "a": "Hesablama",
+      "b": "Tədqiqat",
+      "c": "Dövlət",
+      "d": "Əhali sayı"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 21,
+    "question_text": "Aşağıdakılardan hansı statistikanın nəzəri əsaslarını təşkil edən anlayış və kateqoriyalardan deyildir?",
+    "options": {
+      "a": "Toplu",
+      "b": "Variasiya",
+      "c": "Əlamət",
+      "d": "Hipotetik təfəkkür"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 22,
+    "question_text": "Elmi prinsiplər statistikada nə vasitəsilə ifadə olunur?",
+    "options": {
+      "a": "Sadə nümunələr vasitəsilə",
+      "b": "Təcrübə yolu ilə",
+      "c": "Anlayış və kateqoriyalar vasitəsilə",
+      "d": "Təsadüfi müşahidələrlə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 23,
+    "question_text": "Aşağıdakılardan hansı statistikanın əsas anlayışlarından biri deyil?",
+    "options": {
+      "a": "Qanunauyğunluq",
+      "b": "Əlamət",
+      "c": "Toplu",
+      "d": "Silsilə"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 24,
+    "question_text": "Statistik toplu nə deməkdir?",
+    "options": {
+      "a": "Statistik məlumatların ümumi cəmi",
+      "b": "Eyni əlamət üzrə fərqli keyfiyyətə malik cəmiyyət",
+      "c": "Hər hansı bir əlamət üzrə eyni keyfiyyətə malik olan çoxluq",
+      "d": "Dövlətin əhalisinin ümumi statistikası"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 25,
+    "question_text": "Statistikanın tədqiqatlarında əsasən nə araşdırılır?",
+    "options": {
+      "a": "Fərdi faktlar",
+      "b": "Kütləvi hadisə və proseslər",
+      "c": "Subyektiv fikirlər",
+      "d": "Yalnız iqtisadi göstəricilər"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 26,
+    "question_text": "Statistik qanunauyğunluqlar necə müəyyən olunur?",
+    "options": {
+      "a": "Tək hadisələr əsasında",
+      "b": "Təcrübələr əsasında",
+      "c": "Çoxsaylı hadisələr əsasında",
+      "d": "Fərziyyələr əsasında"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 27,
+    "question_text": "Statistik topluya aşağıdakılardan hansı misal ola bilər?",
+    "options": {
+      "a": "Tək bir tələbə",
+      "b": "Müəssisədəki bütün işçilər",
+      "c": "İqtisadi nəzəriyyələr",
+      "d": "Fərdi rəy və təəssüratlar"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 28,
+    "question_text": "Statistik toplunun tərkibində olan vahidlər necə olur?",
+    "options": {
+      "a": "Təsadüfi və fərqli xüsusiyyətlərə malik vahidlər toplusu təşkil olunur",
+      "b": "Çoxsaylı, yekcins və qarşılıqlı asılılıqda olan",
+      "c": "Həmişə azsaylı və məhdud göstəricilərdən ibarət vahidlər toplusu",
+      "d": "Yalnız iqtisadi göstəricilərlə müəyyən edilən vahidlər sistemi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 29,
+    "question_text": "Statistik toplunun obyektləri nəyi əhatə edir?",
+    "options": {
+      "a": "Real mövcud olan maddi obyektləri",
+      "b": "Yalnız nəzəri ideyaları",
+      "c": "Subyektiv fikirləri",
+      "d": "Hüquqi sənədləri"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 30,
+    "question_text": "Statistika hansı əlavə xüsusiyyəti ilə də məşğul olur?",
+    "options": {
+      "a": "Hüquqi məsləhətlərin verilməsi",
+      "b": "İctimai hadisələrin məkanca yerləşməsi və bölgüsü",
+      "c": "Yalnız sosial hadisələrin iqtisadi analizi",
+      "d": "Tarixi faktların toplanması"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 31,
+    "question_text": "Statistika sosial-iqtisadi hadisələrə hansı aspektdən yanaşır?",
+    "options": {
+      "a": "Keyfiyyətcə",
+      "b": "Kəmiyyətcə",
+      "c": "Fəlsəfi baxımdan",
+      "d": "Hüquqi tərəfdən"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 32,
+    "question_text": "Aşağıdakılardan hansı statistikanın tədqiqat sahəsinə misaldır?",
+    "options": {
+      "a": "Əhalinin sayı və onun ölkələr üzrə bölgüsü",
+      "b": "Fərdi şəxslərin fikirləri",
+      "c": "Hüquqi aktların hazırlanması",
+      "d": "Tarixi sənədlərin təhlili"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 33,
+    "question_text": "Statistika aşağıdakılardan hansı sahələrə iqtisadi xarakteristika verir?",
+    "options": {
+      "a": "İstehsal, bölgü və istehlak",
+      "b": "Hüquqi məsələlər",
+      "c": "Fəlsəfi ideyalar",
+      "d": "İncəsənət və mədəniyyət"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 34,
+    "question_text": "Statistik göstəricilər neçə əsas atributa malikdir?",
+    "options": {
+      "a": "İki",
+      "b": "Üç",
+      "c": "Dörd",
+      "d": "Beş"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 35,
+    "question_text": "Statistik göstəricilərin əsas atributlarından biri deyil:",
+    "options": {
+      "a": "Kəmiyyət müəyyənliyi",
+      "b": "Məkan",
+      "c": "Zaman",
+      "d": "Subyektiv fikir"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 36,
+    "question_text": "Statistik toplunun həcmini ölçməklə nə əldə edilir?",
+    "options": {
+      "a": "Struktur göstəriciləri",
+      "b": "Həcmi göstəriciləri",
+      "c": "Keyfiyyət göstəriciləri",
+      "d": "Tarixi göstəricilər"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 37,
+    "question_text": "Statistikanın üçüncü xüsusiyyəti nə ilə bağlıdır?",
+    "options": {
+      "a": "Sosial-iqtisadi hadisələrin strukturunun səciyyələndirilməsi",
+      "b": "Fərdi faktların toplanması",
+      "c": "Hüquqi sənədlərin tərtibi",
+      "d": "Tək-tək hadisələrin təhlili"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 38,
+    "question_text": "Statistik çoxluğun daxili quruluşuna nə deyilir?",
+    "options": {
+      "a": "Variasiya",
+      "b": "Struktur",
+      "c": "Həcmi göstəricilər",
+      "d": "Qanunauyğunluq"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 39,
+    "question_text": "Statistika strukturu necə müəyyənləşdirməlidir?",
+    "options": {
+      "a": "Təxminlər və fərziyyələr vasitəsilə",
+      "b": "Göstəricilər sisteminin köməyi ilə",
+      "c": "Subyektiv qiymətləndirmələrlə",
+      "d": "Hüquqi aktların əsasında"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 40,
+    "question_text": "Statistikanın dördüncü xüsusiyyəti nə ilə bağlıdır?",
+    "options": {
+      "a": "Hadisələrin məkan və zaman üzrə dəyişməsi",
+      "b": "Fərdi faktların təhlili",
+      "c": "Hüquqi sənədlərin hazırlanması",
+      "d": "Tarixi hadisələrin öyrənilməsi"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 41,
+    "question_text": "Statistikanın dördüncü xüsusiyyəti zamanı necə təsnif edilir?",
+    "options": {
+      "a": "Tarixi və iqtisadi olaraq",
+      "b": "Statikada (məkan üzrə) və dinamikada (zaman üzrə) dəyişmə",
+      "c": "Hüquqi və siyasi olaraq",
+      "d": "Sadəcə keyfiyyətcə"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 42,
+    "question_text": "Statistikanın beşinci xüsusiyyəti nəyi ifadə edir?",
+    "options": {
+      "a": "İctimai hadisə və proseslərin qarşılıqlı əlaqə və asılılıq şəraitində olması",
+      "b": "Yalnız iqtisadi proseslərin təhlili",
+      "c": "Fərdi şəxslərin rəylərinin toplanması",
+      "d": "Tarixi faktların araşdırılması"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 43,
+    "question_text": "Aşağıdakılardan hansı hadisələr arasındakı qarşılıqlı əlaqənin misalıdır?",
+    "options": {
+      "a": "Xammal xərclərinin azalması maya dəyərinin aşağı düşməsinə səbəb olur",
+      "b": "Fərdi şəxslərin fikirlərinin toplanması",
+      "c": "Tarixi sənədlərin təhlili",
+      "d": "İncəsənət əsərlərinin qiymətləndirilməsi"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 44,
+    "question_text": "Statistik tədqiqatın neçə mərhələsi vardır?",
+    "options": {
+      "a": "İki",
+      "b": "Üç",
+      "c": "Dörd",
+      "d": "Beş"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 45,
+    "question_text": "Statistik tədqiqatın üçüncü mərhələsində nə baş verir?",
+    "options": {
+      "a": "Məlumatların təhlili aparılır",
+      "b": "Qruplaşdırma edilir",
+      "c": "Məlumatlar toplanır",
+      "d": "Proqram tərtib olunur"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 46,
+    "question_text": "Azərbaycanda statistika işlərinin təşkili hansı əsas prinsipə əsaslanır?",
+    "options": {
+      "a": "Hər bir qurum öz metodologiyasını istifadə edir",
+      "b": "Statistika işlərinə rəhbərliyin ciddi şəkildə mərkəzləşdirilməsi",
+      "c": "Statistika yalnız müstəqil orqanlar tərəfindən aparılır",
+      "d": "Statistika işləri yalnız regional səviyyədə həyata keçirilir"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 47,
+    "question_text": "Statistika orqanlarının fəaliyyəti hansı əsas prinsiplərə uyğun olmalıdır?",
+    "options": {
+      "a": "İdarəetmə orqanları ilə əlaqəsiz fəaliyyət göstərərək məlumatları qeyri-sistemli toplamaq",
+      "b": "Vahid metodologiya əsasında işlərin aparılması və dövlət idarəetmə orqanları ilə qarşılıqlı əlaqə",
+      "c": "Müxtəlif metodologiyalarla iş apararaq məlumatların təhlilini qarışıq şəkildə həyata keçirmək",
+      "d": "Yalnız öz müstəqil qaydaları ilə iş görərək məlumatların sistemli toplanmasını təmin etməmək"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 48,
+    "question_text": "Azərbaycanda mərkəzləşdirilmiş statistika orqanlarının yaradılması hansı sənəddə öz əksini tapmışdır?",
+    "options": {
+      "a": "\"Rəsmi Statistika haqqında\" Qanun, 1994-cü il",
+      "b": "\"Dövlət Uçotu haqqında\" Qanun, 1990-cı il",
+      "c": "\"İqtisadiyyatın İnkişafı haqqında\" Qanun, 2000-ci il",
+      "d": "\"Mədəniyyətin Qorunması haqqında\" Qanun, 1995-ci il"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 49,
+    "question_text": "1991-ci ildən sonra Azərbaycanda statistika işlərinin aparılmasında nə dəyişdi?",
+    "options": {
+      "a": "Uçot işləri tamamilə dayandırıldı",
+      "b": "Uçot işləri vahid metodologiya ilə aparan mərkəzləşdirilmiş sistem yaradıldı",
+      "c": "Hər rayon öz metodologiyasını təyin etdi",
+      "d": "Statistika yalnız beynəlxalq standartlara uyğun aparıldı"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 50,
+    "question_text": "Azərbaycan Respublikasının \"Rəsmi Statistika haqqında\" Qanunu kimlərə şamil edilir?",
+    "options": {
+      "a": "Dövlət idarələrinə və təşkilatlara",
+      "b": "Fərdi sahibkarlara və vətəndaşlara",
+      "c": "Müxtəlif mülkiyyət formasında olan müəssisələrə, hüquqi və fiziki şəxslərə",
+      "d": "Maliyyə və gömrük qurumlarına"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 51,
+    "question_text": "Azərbaycanda vahid mərkəzləşdirilmiş statistik sistemə rəhbərlik edən qurum hansıdır?",
+    "options": {
+      "a": "Maliyyə Nazirliyi",
+      "b": "Dövlət Statistika Komitəsi",
+      "c": "Vergi Xidməti",
+      "d": "Gömrük Komitəsi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 52,
+    "question_text": "Azərbaycan Respublikasında statistika sisteminin strukturuna aşağıdakılardan hansı daxildir?",
+    "options": {
+      "a": "Fərdi sahibkarlar",
+      "b": "Rayon və şəhər (respublika tabeli) statistika idarələri",
+      "c": "Özəl şirkətlərin maliyyə şöbələri",
+      "d": "Bank və sığorta şirkətləri"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 53,
+    "question_text": "Azərbaycan Respublikasında vahid mərkəzləşdirilmiş statistik sistemi kim idarə edir?",
+    "options": {
+      "a": "Maliyyə Nazirliyi",
+      "b": "Dövlət Statistika Komitəsi",
+      "c": "Mərkəzi Bank",
+      "d": "İqtisadiyyat Nazirliyi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 54,
+    "question_text": "Aşağıdakılardan hansı Dövlət Statistika Komitəsinin fəaliyyətinə daxil deyil?",
+    "options": {
+      "a": "Statistik hesabatların təkmilləşdirilməsi",
+      "b": "İqtisadi və sosial həyat haqqında məlumatların toplanması",
+      "c": "Hüquqi şəxslərin vergi borcunu yığmaq",
+      "d": "Statistik metodologiyanın işlənib hazırlanması"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 55,
+    "question_text": "Statistik məlumatların toplanması və işlənməsi zamanı Azərbaycan Respublikasında əsas hüquqi baza hansıdır?",
+    "options": {
+      "a": "Azərbaycan Respublikası \"Rəsmi Statistika haqqında\" Qanun",
+      "b": "Azərbaycan Respublikası \"Maliyyə nəzarəti haqqında\" Qanun",
+      "c": "Azərbaycan Respublikası \"İqtisadi islahatlar haqqında\" Qanun",
+      "d": "Azərbaycan Respublikası \"İnzibati icraat haqqında\" Qanun"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 56,
+    "question_text": "Dövlət Statistika Komitəsi statistik hesabatların təkmilləşdirilməsi sahəsində hansı qurumlarla əməkdaşlıq edir?",
+    "options": {
+      "a": "Dövlət Gömrük Komitəsi, Maliyyə Nazirliyi, Vergilər Nazirliyi, İqtisadiyyat Nazirliyi",
+      "b": "Təhsil Nazirliyi, Gənclər və İdman Nazirliyi, Mədəniyyət Nazirliyi, Əmək Nazirliyi",
+      "c": "Müdafiə Nazirliyi, Fövqəladə Hallar Nazirliyi, Sərhəd Xidməti, Daxili Qoşunlar",
+      "d": "İctimai birliklər, qeyri-hökumət təşkilatları, sosial qurumlar və assosiasiyalar"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 57,
+    "question_text": "Statistik müşahidə nədir?",
+    "options": {
+      "a": "Fərdi şəxslərin rəylərinin toplanması prosesi",
+      "b": "Vahid proqram əsasında kütləvi sosial-iqtisadi hadisələr haqqında məlumatların toplanması prosesi",
+      "c": "İqtisadi göstəricilər əsasında məlumatların hesablanması və təhlili",
+      "d": "Statistik hesabatların toplanması və emalı prosesi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 58,
+    "question_text": "Statistik müşahidənin düzgün təşkil olunmaması nə ilə nəticələnə bilər?",
+    "options": {
+      "a": "Məlumatların tamlığı və doğruluğu üzrə dəyişiklik baş verə bilər",
+      "b": "Öyrənilən hadisəni səciyyələndirən məlumatların nöqsanlı olması",
+      "c": "Hesablama prosesində səhvlər və uyğunsuzluqlar yarana bilər",
+      "d": "Toplanmış məlumatların təkrarlanması və qarışıqlıq yaranır"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 59,
+    "question_text": "Statistik müşahidənin planı neçə hissədən ibarət olur?",
+    "options": {
+      "a": "Bir hissədən",
+      "b": "Üç hissədən",
+      "c": "İki hissədən",
+      "d": "Dörd hissədən"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 60,
+    "question_text": "Statistik müşahidənin planının \"proqram-metodoloji\" hissəsinə aşağıdakılardan hansı daxildir?",
+    "options": {
+      "a": "Müşahidənin məqsədinin və obyektinin müəyyən edilməsi",
+      "b": "Maliyyə vəsaitlərinin düzgün planlaşdırılması və bölüşdürülməsi",
+      "c": "Toplanmış məlumatların təhlil və yayılması prosesləri",
+      "d": "İqtisadi göstəricilərin hesabatlarda düzgün hazırlanmas"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 61,
+    "question_text": "Statistik müşahidənin planının hansı hissəsi müşahidənin təşkilatını əhatə edir?",
+    "options": {
+      "a": "Proqram-metodoloji hissə",
+      "b": "Təşkilati hissə",
+      "c": "Maliyyə hissəsi",
+      "d": "Analitik hissə"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 62,
+    "question_text": "Toplu vahidi nəyi ifadə edir?",
+    "options": {
+      "a": "Müşahidənin obyekti olan ünsürlər, əlamətin daşıyıcıları",
+      "b": "Statistik hesabatların nəticələrinin sistemli şəkildə təhlili və qeyd edilməsi",
+      "c": "Hesablama metodlarının tətbiqi və nəticələrin qiymətləndirilməsi",
+      "d": "Yalnız kəmiyyət göstəricilərinin qeyd olunması və analiz üçün hazırlanması"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 63,
+    "question_text": "Topludakı vahidlərin sayı nəyi göstərir?",
+    "options": {
+      "a": "Öyrənilən hadisənin kəmiyyəti və yayılmasını",
+      "b": "Statistik hesabatların keyfiyyətini və düzgünlüyünü qiymətləndirmək üçün tədbirləri",
+      "c": "Hesablama sürətinin təhlilini və optimallaşdırılmasını təmin etməyi",
+      "d": "Məlumatların toplanma metodunu sistemli şəkildə müəyyən etmək və qeyd etməyi"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 64,
+    "question_text": "Toplu vahidlərin sayının dəyişməsi nəyi əks etdirir?",
+    "options": {
+      "a": "Hesablamaların səhvini",
+      "b": "Hadisənin inkişafını",
+      "c": "Statistikanın metodologiyasını",
+      "d": "Proqram-metodoloji planı"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 65,
+    "question_text": "Əhali siyahıyaalınmasında müşahidə vahidi kimi nə götürülür?",
+    "options": {
+      "a": "Bütün ölkənin regionları",
+      "b": "Hər bir ölkə sakini",
+      "c": "Ailələrin ümumi sayı",
+      "d": "Əhalinin yaş strukturu"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 66,
+    "question_text": "Aşağıdakı sahələrdən hansında \"fermer təsərrüfatı\" müşahidə vahidi sayılır?",
+    "options": {
+      "a": "Sənaye",
+      "b": "Ticarət",
+      "c": "Əhali siyahıyaalınması",
+      "d": "Kənd təsərrüfatı"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 67,
+    "question_text": "Müşahidə vahidinin düzgün müəyyən edilməsi hansı mərhələ üçün vacibdir?",
+    "options": {
+      "a": "Yalnız nəticələrin qiymətləndirilməsi",
+      "b": "Məlumatların toplanması",
+      "c": "Hesabatların hazırlanması",
+      "d": "Göstəricilərin qrafikləşdirilməsi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 68,
+    "question_text": "Suallar hansı səbəbdən elə tərtib olunmalıdır ki, qeydiyyat aparanlar onların mənasını eyni cür başa düşsünlər?",
+    "options": {
+      "a": "Nəticələrin təsadüfi alınması üçün",
+      "b": "Məlumatların təxmini şəkildə toplanması üçün",
+      "c": "Tədqiqat nəticələrinin obyektiv və dəqiq olması üçün",
+      "d": "Statistik hesabatların qısa müddətdə hazırlanması üçün"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 69,
+    "question_text": "Aşağıdakılardan hansı siyahıyaalma zamanı vərəqədə qeyd olunur?",
+    "options": {
+      "a": "Ancaq şəxsin ad və soyadı",
+      "b": "Yalnız yaşayış yeri",
+      "c": "Şəxsin cinsi, yaşı, peşəsi, təhsili və milliyyəti",
+      "d": "Şəxsin bank hesabı və gəliri"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 70,
+    "question_text": "Müxtəlif mülkiyyət formalarına mənsub hüquqi şəxslər statistikaya nə təqdim edirlər?",
+    "options": {
+      "a": "Öz məhsullarının statistik uçotu üçün məlumatlar",
+      "b": "Vergi hesabatlarının statistik formatda təqdimatı",
+      "c": "Tədqiqat planlarının statistik tələblərə uyğun təqdimat",
+      "d": "Müəyyən göstəriciləri əks etdirən hesabatlar"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 71,
+    "question_text": "Statistik göstəricilər əsasən nə üçün istifadə olunur?",
+    "options": {
+      "a": "Nəticələri gizlətmək üçün",
+      "b": "Tədqiqatın məqsədini qrafik şəkildə təqdim etmək üçün",
+      "c": "Hadisəyə kəmiyyət xarakteristikası vermək üçün",
+      "d": "Sualların sadələşdirilməsi üçün"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 72,
+    "question_text": "Sənədlərin doldurulması üçün hansı sənəd hazırlanır?",
+    "options": {
+      "a": "Təklif məktubu",
+      "b": "Təlimat",
+      "c": "Qaimə",
+      "d": "Xülasə"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 73,
+    "question_text": "\"İcraçı\" dedikdə burada nə nəzərdə tutulur?",
+    "options": {
+      "a": "Yalnız rəhbərlik funksiyası olan şəxslər",
+      "b": "Sorğularda iştirak edən şəxslər",
+      "c": "Müşahidəni yerinə yetirən konkret şəxslər",
+      "d": "Statistikanı oxuyan tələbələr"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 74,
+    "question_text": "Statistik müşahidənin neçə forması mövcuddur?",
+    "options": {
+      "a": "1",
+      "b": "2",
+      "c": "3",
+      "d": "4"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 75,
+    "question_text": "Statistik müşahidənin əsas forması hansıdır?",
+    "options": {
+      "a": "Sorğu əsasında",
+      "b": "Anketlə",
+      "c": "Hesabat təqdim etmək",
+      "d": "Telefon zəngi ilə"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 76,
+    "question_text": "Statistik məlumatların yekunlaşdırılması nədir?",
+    "options": {
+      "a": "İbtidai məlumatları sistemləşdirərək ümumi təhlil üçün hazırlamaq və qeyd etmək",
+      "b": "Topluya ümumiləşdirici xarakteristika vermək üçün ilkin məlumatların elmi işlənməsi",
+      "c": "Məlumatları sadəcə qeyd edərək saxlayıb heç bir təhlil aparmamaq",
+      "d": "Məlumatları təsadüfi şəkildə seçərək qeyri-sistemli şəkildə toplamaq"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 77,
+    "question_text": "Statistik yekunlaşdırmanın əsas vəzifələrindən biri nədir?",
+    "options": {
+      "a": "Məlumatları sistemli şəkildə qeyd etmək və analiz üçün hazırlamaq",
+      "b": "Hadisələri seçərkən ardıcıllığı və əlaqələri nəzərə almaq",
+      "c": "Öyrənilən hadisələri tiplərə ayırmaq və səciyyəvi cəhətlərini müəyyən etmək",
+      "d": "Hesablamaları lazımi qaydada təşkil etmədən saxlamaq"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 78,
+    "question_text": "Yekunlaşdırma əsasında hansı proseslər aşkara çıxarılır?",
+    "options": {
+      "a": "Məlumatların izlənilməsi və yoxlanılması üçün tədbirlər",
+      "b": "Hadisələr və proseslər arasındakı qarşılıqlı əlaqə və asılılıqlar",
+      "c": "Yalnız kəmiyyət dəyişikliklərinin müəyyənləşdirilməsi və qiymətləndirilməsi",
+      "d": "Yalnız keyfiyyət dəyişikliklərinin analizi və qiymətləndirilməsi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 79,
+    "question_text": "Statistik məlumatların yekunlaşdırılması necə aparılır?",
+    "options": {
+      "a": "Təsadüfi məlumatların toplanması ilə",
+      "b": "Qabaqcadan tərtib olunmuş proqram əsasında",
+      "c": "Yalnız elektron üsullarla",
+      "d": "Sənədlərin kopyalanması ilə"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 80,
+    "question_text": "Yekunlaşdırmada proqram nəyi ehtiva edir?",
+    "options": {
+      "a": "Tədqiq olunan hadisəni öyrənmək üçün obyektlərin siyahısını və onları ifadə edən göstəriciləri",
+      "b": "Hesabatların hazırlanması üçün bütün mərhələləri sistemli şəkildə təşkil etmək və planlaşdırmaq",
+      "c": "Məlumatları təsadüfi şəkildə bölərək strukturlaşdırma işlərini aparmaq",
+      "d": "Məlumatların saxlanması və qorunması üçün müvafiq qaydalar tətbiq etmək"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 81,
+    "question_text": "Statistik məlumatların yekunlaşdırılmasının məqsədi nədir?",
+    "options": {
+      "a": "Nəticələri sistemli şəkildə təqdim etmək və onların düzgünlüyünü təmin etmək",
+      "b": "Statistik hesabatları toplayıb lazımi ardıcıllıqla təşkil etmək",
+      "c": "Məlumatları ümumiləşdirərək tədqiq olunan hadisəni daha yaxşı anlamaq",
+      "d": "Məlumatların təhlükəsizliyini təmin etmədən saxlanması və itirilməsi"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 82,
+    "question_text": "Statistik məlumatların yekunlaşdırmasının neçə növü vardır?",
+    "options": {
+      "a": "1",
+      "b": "2",
+      "c": "3",
+      "d": "4"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 83,
+    "question_text": "Sadə yekunlaşdırmanın əsas xüsusiyyəti nədir?",
+    "options": {
+      "a": "Geniş və dərindən təhlil imkanı verir",
+      "b": "Müxtəlifliyi aşkara çıxarır",
+      "c": "Qrup üzrə təhlil üçün istifadə olunur",
+      "d": "Məhdud xarakter daşıyır və eynitipli hadisələr üçün istifadə olunur"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 84,
+    "question_text": "Sadə yekunlaşdırmanın tətbiqi hansı hallarda nadir olur?",
+    "options": {
+      "a": "Hadisələr müxtəlif olduqda",
+      "b": "Hadisələr eynitipli olduqda",
+      "c": "Statistik hesabatlarda",
+      "d": "Sorğu üsulu ilə məlumat toplananda"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 85,
+    "question_text": "Statistik tədqiqatda sadə yekunlaşdırma kifayət etməyən səbəb nədir?",
+    "options": {
+      "a": "Hadisələrin tərkibcə müxtəlif və fərqli olması",
+      "b": "Məlumatların itməsi",
+      "c": "Yalnız kiçik toplulara aid olması",
+      "d": "Hesablamaların çətinliyi"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 86,
+    "question_text": "Qrup üzrə yekunlaşdırmanın əsas vəzifəsi nədir?",
+    "options": {
+      "a": "Məlumatları qeyd edib onları sistemli şəkildə təhlil üçün hazırlamaq",
+      "b": "Hadisələr arasındakı müxtəlifliyi aşkara çıxarmaq və dərindən təhlil etmək",
+      "c": "Statistik sənədləri toplamaq və onları düzgün ardıcıllıqla saxlamaq",
+      "d": "Sorğuların aparılması və nəticələrin düzgün şəkildə qeyd edilməsi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 87,
+    "question_text": "Statistik məlumatların tərkibinə görə müxtəlifliyi aşkara çıxarmaq üçün hansı növ yekunlaşdırma tətbiq olunur?",
+    "options": {
+      "a": "Sadə yekunlaşdırma",
+      "b": "Qrup üzrə yekunlaşdırma",
+      "c": "Bilavasitə müşahidə",
+      "d": "Anket üsulu"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 88,
+    "question_text": "Məlumatların işlənməsi formasına görə yekunlaşdırmanın neçə növü var?",
+    "options": {
+      "a": "1",
+      "b": "2",
+      "c": "3",
+      "d": "4"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 89,
+    "question_text": "Mərkəzləşdirilmiş yekunlaşdırmanın əsas xüsusiyyəti nədir?",
+    "options": {
+      "a": "Məlumatların müxtəlif yerlərdə işlənməsi",
+      "b": "Hesabatların regionlara göndərilməsi",
+      "c": "Yalnız anket üsulu ilə aparılması",
+      "d": "İlkin məlumatların hamısının bir təşkilata daxil olub orada işlənməsi"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 90,
+    "question_text": "Mərkəzləşdirilmiş yekunlaşdırma adətən nə üçün istifadə olunur?",
+    "options": {
+      "a": "Fasiləli müşahidələrdə",
+      "b": "Birdəfəlik statistik müayinələrin işlənməsində",
+      "c": "Hesabatların bölgələr üzrə hazırlanmasında",
+      "d": "Məlumatların təsadüfi seçilməsində"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 91,
+    "question_text": "Qeyri-mərkəzləşdirilmiş yekunlaşdırmada ilkin məlumatlar necə işlənir?",
+    "options": {
+      "a": "Bir yerdə toplanaraq sistemli şəkildə qeyd edilir və ilkin təhlil aparılır",
+      "b": "Bir neçə mərhələdə müxtəlif səviyyələrdə işlənir",
+      "c": "Yalnız anket üsulu ilə məlumatlar toplanır və ilkin qeydiyyat aparılır",
+      "d": "Hesabat verilmədən məlumatlar toplanır və qeydiyyata alınır"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 92,
+    "question_text": "Qeyri-mərkəzləşdirilmiş yekunlaşdırma zamanı hesabatlar ilk olaraq haraya göndərilir?",
+    "options": {
+      "a": "Respublika Statistika Komitəsinə",
+      "b": "Ərazi statistika idarəsinə",
+      "c": "Dövlət qeydiyyat orqanına",
+      "d": "Müəssisələrə"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 93,
+    "question_text": "Qeyri-mərkəzləşdirilmiş yekunlaşdırmanın sonunda göstəricilər harada müəyyən edilir?",
+    "options": {
+      "a": "Regionlarda toplanan məlumatların analiz və qiymətləndirilməsi üçün mərkəzləşdirilmiş hesabatlar hazırlanır",
+      "b": "Müəssisələrdə toplanan göstəricilər sistemli şəkildə qeyd olunur və təhlil üçün hazırlıq aparılır",
+      "c": "Respublika Statistika Komitəsində",
+      "d": "Məktəblərdə məlumatların toplanması və ilkin təhlili həyata keçirilir"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 94,
+    "question_text": "Yerinə yetirilmə texnikasına görə yekunlaşdırmanın neçə növü vardır?",
+    "options": {
+      "a": "1",
+      "b": "2",
+      "c": "3",
+      "d": "4"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 95,
+    "question_text": "Kompüterlə yekunlaşdırma nə deməkdir?",
+    "options": {
+      "a": "Hesabatların əl ilə toplanması",
+      "b": "Bütün əməliyyatların kompüter və proqram vasitəsilə aparılması",
+      "c": "Sadə hesablama işlərini sistemli şəkildə təşkil etmək və qeyd etmək",
+      "d": "Məlumatları yazılı formada saxlamaq və onların təhlükəsizliyini təmin etmək"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 96,
+    "question_text": "Kompüterlə yekunlaşdırmanın üstünlüyü nədir?",
+    "options": {
+      "a": "Hesablamaların yavaş aparılması",
+      "b": "Məlumatların əl ilə qeyd olunması",
+      "c": "İstənilən həcmdə informasiyanı sürətli və tez işləmək imkanı vermək",
+      "d": "Sadəcə kiçik məlumatlar üçün uyğun olması"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 97,
+    "question_text": "Əl ilə yekunlaşdırma nə deməkdir?",
+    "options": {
+      "a": "Bütün əməliyyatların kompüterlə aparılması",
+      "b": "Məlumatların əllə, əl üsulları ilə işlənməsi",
+      "c": "Yalnız anketlərin doldurulması",
+      "d": "Məlumatların elektron formada saxlanması"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 98,
+    "question_text": "Kompüterlə yekunlaşdırma aşağıdakılardan hansına imkan vermir?",
+    "options": {
+      "a": "Sürətli məlumat işlənməsinə",
+      "b": "Böyük həcmdə informasiyanın emalına",
+      "c": "Məlumatların itirilməsinə",
+      "d": "Avtomatlaşdırılmış hesablama"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 99,
+    "question_text": "Əl ilə yekunlaşdırmanın əsas mənfi tərəfi nədir?",
+    "options": {
+      "a": "Avtomatlaşdırılması",
+      "b": "Hesablamaların yavaş aparılması və səhvlərin çox olması",
+      "c": "Kompüter istifadə etməsi",
+      "d": "Proqramların köməyi ilə işləməsi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 100,
+    "question_text": "Qruplaşdırmanın neçə növü vardır?",
+    "options": {
+      "a": "1",
+      "b": "2",
+      "c": "3",
+      "d": "4"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 101,
+    "question_text": "Aşağıdakılardan hansı qruplaşdırmanın növlərindən biridir?",
+    "options": {
+      "a": "Hesabat qruplaşdırması",
+      "b": "Analitik qruplaşdırma",
+      "c": "Mərkəzləşdirilmiş qruplaşdırma",
+      "d": "Fasiləli qruplaşdırma"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 102,
+    "question_text": "Mürəkkəb qruplaşdırmanın neçə növü vardır?",
+    "options": {
+      "a": "1",
+      "b": "2",
+      "c": "3",
+      "d": "4"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 103,
+    "question_text": "Aşağıdakılardan hansı mürəkkəb qruplaşdırmanın növlərinə aiddir?",
+    "options": {
+      "a": "Tipik və quruluş",
+      "b": "Atributiv və miqdar",
+      "c": "Sadə və analitik",
+      "d": "Quraşıq və çoxölçülü"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 104,
+    "question_text": "İkinci dəfə qruplaşdırma nədir?",
+    "options": {
+      "a": "Topluda vahidlərin ilk dəfə qruplaşdırılması",
+      "b": "Əvvəlki qruplaşdırmaya əsasən yeni qrupların yaradılması",
+      "c": "Məlumatların toplanması",
+      "d": "Statistik hesabatların hazırlanması"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 105,
+    "question_text": "İkinci dəfə qruplaşdırmada istifadə olunan üsullardan biri hansıdır?",
+    "options": {
+      "a": "İnvəntaşdırma",
+      "b": "İnvəntarlaşdırma",
+      "c": "Əvvəlki intervalların iriləşdirilməsi",
+      "d": "Məlumatların qeydiyyatı"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 106,
+    "question_text": "Statistika cədvəllərində üfiqi xətlər və şaquli xətlərin kəsişməsi ilə nə əmələ gəlir?",
+    "options": {
+      "a": "Qrafiklər",
+      "b": "Başlıqlar",
+      "c": "Rəqəmlər",
+      "d": "Xanalar"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 107,
+    "question_text": "Statistika cədvəllərində şaquli hissələrə nə ad verilir?",
+    "options": {
+      "a": "Sətir",
+      "b": "Qrafik",
+      "c": "Qrafalar (sütunlar)",
+      "d": "Göstəricilər"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 108,
+    "question_text": "Cədvəldə məlumatlar əsasən necə göstərilir?",
+    "options": {
+      "a": "Sözlərlə izah olunur",
+      "b": "Qrafiklərlə verilir",
+      "c": "Xanalar şəklində rəqəmlərlə yazılır",
+      "d": "Əllə çəkilmiş şəkillərlə izah olunur"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 109,
+    "question_text": "Cədvəldə hansı hissə onun bütün məzmununu ümumi şəkildə əks etdirir?",
+    "options": {
+      "a": "Qrafalar",
+      "b": "Başlıq",
+      "c": "Xanalar",
+      "d": "Cədvəlin altbilgisi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 110,
+    "question_text": "Statistika cədvəllərində \"qrafalar\" hansı istiqamətdə yerləşir?",
+    "options": {
+      "a": "Diaqonal",
+      "b": "Üfiqi",
+      "c": "Şaquli",
+      "d": "Qarışıq"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 111,
+    "question_text": "Cədvəldə sətirlər hansı istiqamətdə yerləşir?",
+    "options": {
+      "a": "Şaquli",
+      "b": "Yuxarıdan aşağıya",
+      "c": "Əyri xətt üzrə",
+      "d": "Üfiqi"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 112,
+    "question_text": "Cədvəllərdə yer alan rəqəmlər nəyi ifadə edir?",
+    "options": {
+      "a": "Tarixi hadisələri və onların ardıcıllığını sistemli şəkildə qeyd etmək",
+      "b": "Məlumatların say və ya ölçü baxımından ifadəsini",
+      "c": "Ədəbi nümunələrin təhlili və onların təsnifatı üçün istifadə olunur",
+      "d": "Qrafik formaların yaradılması və nümayişi üçün məlumatları göstərir"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 113,
+    "question_text": "Statistika cədvəlinin qrafalarında yerləşdirilən adlara nə deyilir?",
+    "options": {
+      "a": "Nəticə",
+      "b": "Sətir",
+      "c": "Başlıqlar",
+      "d": "Məlumat"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 114,
+    "question_text": "Cədvəllərin qurulmasında əsas məqsəd nədir?",
+    "options": {
+      "a": "Məlumatları vizual şəkildə əyləncəli göstərmək",
+      "b": "Məlumatları təsadüfi düzülüşdə vermək",
+      "c": "Məlumatları sistemli və aydın şəkildə təqdim etmək",
+      "d": "Məlumatları gizlətmək"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 115,
+    "question_text": "Aşağıdakılardan hansı statistik cədvəlin əsas tərkib hissəsi DEYİLdir?",
+    "options": {
+      "a": "Başlıq",
+      "b": "Qrafalar",
+      "c": "Sətirlər",
+      "d": "Düsturlar"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 116,
+    "question_text": "Mübtədasının düzəldilməsinə görə statistika cədvəlləri neçə yerə ayrılır?",
+    "options": {
+      "a": "2",
+      "b": "3",
+      "c": "4",
+      "d": "5"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 117,
+    "question_text": "Aşağıdakılardan hansı statistika cədvəli növüdür?",
+    "options": {
+      "a": "Xəritə cədvəli",
+      "b": "Təsviri cədvəl",
+      "c": "Qrup üzrə cədvəl",
+      "d": "Simvolik cədvəl"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 118,
+    "question_text": "Mübtədasında qruplaşdırma aparılmamış cədvəllər necə adlanır?",
+    "options": {
+      "a": "Quraşdırılmış cədvəllər",
+      "b": "Qrup üzrə cədvəllər",
+      "c": "Sadə cədvəllər",
+      "d": "Xronoloji cədvəllər"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 119,
+    "question_text": "Sadə cədvəllər neçə yerə bölünür?",
+    "options": {
+      "a": "2",
+      "b": "3",
+      "c": "4",
+      "d": "5"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 120,
+    "question_text": "Aşağıdakılardan hansı sadə cədvəl növü deyildir?",
+    "options": {
+      "a": "Xronoloji sadə cədvəl",
+      "b": "Quraşdırılmış cədvəl",
+      "c": "Ərazi üzrə sadə cədvəl",
+      "d": "Siyahı ilə sadə cədvəl"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 121,
+    "question_text": "Mübtədasında siyahı olan sadə cədvəl hansı qrupa aiddir?",
+    "options": {
+      "a": "Quraşdırılmış cədvəllər",
+      "b": "Qrup üzrə cədvəllər",
+      "c": "Sadə cədvəllər",
+      "d": "Təsviri cədvəllər"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 122,
+    "question_text": "Xronoloji sadə cədvəllərin əsas xüsusiyyəti nədir?",
+    "options": {
+      "a": "Ərazi üzrə bölünməsi və məlumatların sistemli şəkildə qruplaşdırılması",
+      "b": "Müxtəlif düsturların tətbiqi ilə göstəricilərin hesablanması və təhlili",
+      "c": "Müəyyən dövr üçün mühüm göstəricilərlə müqayisə aparılmasıdır",
+      "d": "Rəqəmlərin siyahı şəklində verilməsi və sistemli şəkildə qeyd olunması"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 123,
+    "question_text": "Statistik göstərici nəyi ifadə edir?",
+    "options": {
+      "a": "Sosial-iqtisadi hadisə və proseslərin rəqəmlərlə ifadəsi",
+      "b": "Yalnız iqtisadiyyatın inkişafını",
+      "c": "Cədvəl və qrafiklərin ölçüsünü",
+      "d": "Məqalələrin başlıqlarını"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 124,
+    "question_text": "Konkret statistik göstərici nəyi göstərir?",
+    "options": {
+      "a": "Məkan və zaman üzrə hadisənin həcmini",
+      "b": "Hadisənin səbəbini müəyyən etmək və təhlil üçün qeyd etmək",
+      "c": "Statistik məlumatların formatını sistemli şəkildə müəyyən etmək",
+      "d": "Cədvəl ölçüsünü təyin etmək və məlumatları yerləşdirmək"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 125,
+    "question_text": "Göstərici-kateqoriya nəyi səciyyələndirir?",
+    "options": {
+      "a": "Hadisələrin səbəbini və nəticəsini",
+      "b": "Eynitipli konkret göstəricilərin ümumi cəhətlərini",
+      "c": "Cədvəldəki ən böyük rəqəmi",
+      "d": "Yalnız iqtisadi göstəriciləri"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 126,
+    "question_text": "Statistik göstərici kimi aşağıdakılardan hansı nümunədir?",
+    "options": {
+      "a": "Məqalə başlığı",
+      "b": "Əhalinin sayı",
+      "c": "Yazı tipi",
+      "d": "Rəqəmlərin şrift rəngi"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 127,
+    "question_text": "Statistik göstəricilərin rəqəmlərlə ifadə olunmasının məqsədi nədir?",
+    "options": {
+      "a": "Hadisəni sadələşdirmək və sistemli şəkildə qeyd etmək",
+      "b": "Hadisənin keyfiyyətini artırmaq və təhlil üçün göstəricilər yaratmaq",
+      "c": "Hadisə və prosesləri kəmiyyətcə ölçmək və müqayisə etmək",
+      "d": "Rəqəmləri gözəlləşdirmək və məlumatları vizual göstərmək"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 128,
+    "question_text": "Fərdi göstəricilər nəyi xarakterizə edir?",
+    "options": {
+      "a": "Bütün statistik toplunu",
+      "b": "Statistik toplunun bir hissəsini",
+      "c": "Ayrı-ayrı obyektləri və ya vahidləri",
+      "d": "Statistik məlumatların ümumi xülasəsini"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 129,
+    "question_text": "Aşağıdakılardan hansı fərdi göstəriciyə misaldır?",
+    "options": {
+      "a": "Müəssisənin işçi sayı",
+      "b": "Ölkənin ümumi əhalisi",
+      "c": "Bütün bankların kredit həcmi",
+      "d": "İqtisadiyyatın ümumi məhsulu"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 130,
+    "question_text": "Statistik göstəricilər ifadə edilmə formalarına görə necə bölünür?",
+    "options": {
+      "a": "Rəqəmli, yazılı və vizual",
+      "b": "Mütləq, nisbi və orta kəmiyyətlər",
+      "c": "Fərdi və ümumi",
+      "d": "Sadə və mürəkkəb"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 131,
+    "question_text": "Mütləq göstəricilər nəyi göstərir?",
+    "options": {
+      "a": "Orta hesabı hesablamaq və nəticələri müqayisə etmək",
+      "b": "Hadisənin nisbi dəyərini ölçmək və təhlil üçün göstərmək",
+      "c": "Rəqəmlərlə ölçülən hadisənin tam həcm və ya sayını",
+      "d": "Rəqəmlərin rəngini dəyişdirərək vizual nümayişini təmin etmək"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 132,
+    "question_text": "Nisbi göstəricilər nəyi əks etdirir?",
+    "options": {
+      "a": "Hadisənin hissə nisbətini və ya faizlə ifadəsini",
+      "b": "Hadisənin tam həcmindəki dəyişiklikləri sistemli şəkildə qeyd etmək",
+      "c": "Yalnız fərdi məlumatları toplayıb qeyd etmək və təhlil üçün hazırlamaq",
+      "d": "Rəqəmlərin üstündəki başlıqları göstərmək və məlumatları təsnif etmək"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 133,
+    "question_text": "Orta kəmiyyət göstəricisi nəyi ifadə edir?",
+    "options": {
+      "a": "Rəqəmlərin sırasını",
+      "b": "Statistik məlumatların cəmini",
+      "c": "Statistik toplunun tam həcmini",
+      "d": "Statistik toplunun bir vahidinə düşən orta qiyməti"
+    },
+    "correct_answer": "d"
+  },
+  {
+    "question_number": 134,
+    "question_text": "Aşağıdakılardan hansı mütləq kəmiyyət nümunəsidir?",
+    "options": {
+      "a": "Əhalinin illik artım faizi",
+      "b": "Ölkədəki əhalinin sayı",
+      "c": "Bir işçiyə düşən məhsulun dəyəri",
+      "d": "Sənaye məhsulunun orta artımı"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 135,
+    "question_text": "Orta kəmiyyətlərin əsas funksiyası nədir?",
+    "options": {
+      "a": "Toplunun ən böyük dəyərini göstərmək",
+      "b": "Toplunun kəmiyyətcə dəyişən əlamətinə ümumi xarakteristika vermək",
+      "c": "Topluda ən çox təkrarlanan dəyəri tapmaq",
+      "d": "Keyfiyyətcə fərqli topluları müqayisə etmək"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 136,
+    "question_text": "Orta kəmiyyətlərin hesablanması zamanı hansı tələb vacibdir?",
+    "options": {
+      "a": "Hesablama üçün təsadüfi nümunə kifayətdir",
+      "b": "Toplu keyfiyyətcə müxtəlif ola bilər",
+      "c": "Məlumatlar müqayisə edilə bilən olmalıdır",
+      "d": "İlkin məlumatlar az sayda olmalıdır"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 137,
+    "question_text": "Orta kəmiyyətlər hansı göstəricilərdən hesablanır?",
+    "options": {
+      "a": "Yalnız mütləq göstəricilərdən",
+      "b": "Yalnız nisbi göstəricilərdən",
+      "c": "Həm mütləq, həm də nisbi göstəricilərdən",
+      "d": "Heç birindən hesablanmır"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 138,
+    "question_text": "Aşağıdakılardan hansı orta kəmiyyətlərin ölçü vahidi deyil?",
+    "options": {
+      "a": "Ton",
+      "b": "Metr",
+      "c": "Faiz",
+      "d": "Ədəd"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 139,
+    "question_text": "Orta kəmiyyətlərin hesablanması üçün məlumatlar hansı tipdə olmalıdır?",
+    "options": {
+      "a": "Keyfiyyətcə eynitipli toplu üzrə",
+      "b": "Müxtəlif tipli toplu üzrə",
+      "c": "Təsadüfi seçilmiş fərdlər üzrə",
+      "d": "Kiçik nümunə əsasında"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 140,
+    "question_text": "Orta kəmiyyətlərin hesablama zamanı hansı kəmiyyətlərdən istifadə edilə bilər?",
+    "options": {
+      "a": "Müqayisə olunmayan kəmiyyətlərdən",
+      "b": "Nisbətən az olan kəmiyyətlərdən",
+      "c": "Müqayisə edilə bilən mütləq və nisbi kəmiyyətlərdən",
+      "d": "Keyfiyyət göstəricilərindən"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 141,
+    "question_text": "Orta kəmiyyətlər hansı halda istifadə olunur?",
+    "options": {
+      "a": "Toplunun tək bir vahidini xarakterizə etmək üçün",
+      "b": "Toplunun ümumi strukturunu öyrənmək üçün",
+      "c": "Toplunun kəmiyyətcə dəyişən əlamətini ümumiləşdirmək üçün",
+      "d": "Fərdi müşahidələri müqayisə etmək üçün"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 142,
+    "question_text": "Statistikada orta kəmiyyətlərin düzgün hesablanması üçün ilkin məlumatların ... olması vacibdir.",
+    "options": {
+      "a": "Rəqəmsal və rəngli",
+      "b": "Keyfiyyətcə müxtəlif",
+      "c": "Müqayisə edilə bilən",
+      "d": "Az və təsadüfi"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 143,
+    "question_text": "Orta kəmiyyətlərin hesablanması üçün məlumatlar hansı tipdə olmalıdır?",
+    "options": {
+      "a": "Təsadüfi seçilmiş fərdi məlumatlar",
+      "b": "Keyfiyyətcə fərqli toplular",
+      "c": "Keyfiyyətcə eynitipli toplu",
+      "d": "Kiçik nümunələr"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 144,
+    "question_text": "Orta kəmiyyət hansı şəraitdə hesablanır?",
+    "options": {
+      "a": "İstənilən şəraitdə",
+      "b": "Konkret məkan və zaman şəraitində",
+      "c": "Sadəcə zaman şəraitində",
+      "d": "Konkret məkan şəraitində"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 145,
+    "question_text": "Statistikada orta kəmiyyətlərdən geniş istifadə olunan sahə hansıdır?",
+    "options": {
+      "a": "Sadəcə iqtisadiyyat",
+      "b": "Sadəcə demoqrafiya",
+      "c": "Uçot və statistika işləri",
+      "d": "Yalnız sosial xidmətlər"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 146,
+    "question_text": "Orta kəmiyyət dəyişən əlamətin hansı cəhətlərini ifadə edir?",
+    "options": {
+      "a": "Səciyyəvi cəhətlərini",
+      "b": "Heç bir cəhətini ifadə etmir",
+      "c": "Təsadüfi cəhətlərini",
+      "d": "Yalnız ən böyük dəyərini"
+    },
+    "correct_answer": "a"
+  },
+  {
+    "question_number": 147,
+    "question_text": "Statistikada orta kəmiyyət nə üçün istifadə edilir?",
+    "options": {
+      "a": "Fərdi vahidlərin kəmiyyətini göstərmək üçün",
+      "b": "Eynitipli hadisələrə ümumiləşdirilmiş kəmiyyət xarakteristikası vermək üçün",
+      "c": "Təsadüfi rəqəmləri hesablamaq üçün",
+      "d": "Statistik cədvəlin həcmini artırmaq üçün"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 148,
+    "question_text": "Aşağıdakılardan hansı orta kəmiyyətə aid deyil?",
+    "options": {
+      "a": "Orta illik artım sürəti",
+      "b": "İstehsal xərclərinin orta hesabla aşağı salınması",
+      "c": "Statistik toplunun ümumi sayısı",
+      "d": "İşçilərin orta əmək haqqı"
+    },
+    "correct_answer": "c"
+  },
+  {
+    "question_number": 149,
+    "question_text": "Statistikada orta kəmiyyətlərin hesablanması aşağıdakılardan hansını tələb edir?",
+    "options": {
+      "a": "Dəyişməyən əlamətlərin olması",
+      "b": "Dəyişən əlamətin olması",
+      "c": "Statistik cədvəldə bütün dəyərlərin bərabər olması",
+      "d": "Sadəcə ən yüksək dəyərin olması"
+    },
+    "correct_answer": "b"
+  },
+  {
+    "question_number": 150,
+    "question_text": "Orta kəmiyyətlərin köməyi ilə aşağıdakılardan hansı müəyyən edilə bilər?",
+    "options": {
+      "a": "Müəssisələrin ümumi sayı",
+      "b": "İşçilərin orta əmək haqqı",
+      "c": "Toplunun tam statistik şəkli",
+      "d": "Statistik cədvəldəki hər bir fərdi məlumat"
+    },
+    "correct_answer": "b"
+  }
+];
+        // Oyun dəyişənləri
+// Oyun dəyişənləri
+let currentQuestionIndex = 0;
+let userAnswers = [];
+let quizStarted = false;
+let userName = '';
+let timerInterval;
+const totalTime = 40;
+let timeLeft = totalTime;
+let isTimerPaused = false;
+let autoNextTimeout;
+
+// DOM elementləri
+const startContainer = document.getElementById('start-container');
+const quizHeader = document.getElementById('quiz-header');
+const quizContainer = document.getElementById('quiz-container');
+const resultContainer = document.getElementById('result-container');
+const questionElement = document.getElementById('question');
+const optionsContainer = document.getElementById('options-container');
+const progressElement = document.getElementById('progress');
+const questionCounterElement = document.getElementById('question-counter');
+const timerDisplayElement = document.getElementById('timer-display');
+const timerBarElement = document.getElementById('timer-bar');
+const nextBtn = document.getElementById('next-btn');
+const timerToggleBtn = document.getElementById('timer-toggle-btn');
+const autoNextMessage = document.getElementById('auto-next-message');
+const userGreeting = document.getElementById('user-greeting');
+const progressCircles = document.getElementById('progress-circles');
+const statsDetails = document.getElementById('stats-details');
+
+// ====== ƏSAS DƏYİŞİKLİKLƏR ======
+// 1. Avtomatik giriş sistemi
+window.onload = function() {
+    // LocalStorage-dən istifadəçi məlumatlarını yoxla
+    const savedUsername = localStorage.getItem('quizUsername');
+    const savedIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    if (savedIsLoggedIn && savedUsername) {
+        // Əvvəlki giriş məlumatları var
+        userName = savedUsername;
+        userGreeting.innerHTML = `<strong>${userName}</strong> olaraq giriş etdiniz!`;
+    } else {
+        // Yeni giriş - təsadüfi ad
+        const guestNames = ['Qonaq', 'İstifadəçi', 'Tələbə', 'Tədqiqatçı', 'Biliksevər'];
+        userName = guestNames[Math.floor(Math.random() * guestNames.length)];
+        localStorage.setItem('quizUsername', userName);
+        localStorage.setItem('isLoggedIn', 'true');
+        userGreeting.innerHTML = `<strong>${userName}</strong> olaraq giriş etdiniz!`;
+    }
+    
+    // Particles yarat
+    createParticles();
+    
+    // Progress circles yarat
+    createProgressCircles();
+    
+    // Event listener-ları əlavə et
+    setupEventListeners();
+};
+
+function setupEventListeners() {
+    // Start button
+    document.getElementById('start-btn').addEventListener('click', () => {
+        console.log('Start button clicked!');
+        startContainer.style.display = 'none';
+        quizHeader.style.display = 'grid';
+        quizContainer.style.display = 'block';
+        document.getElementById('username-display').textContent = userName;
+        loadQuestion(currentQuestionIndex);
+    });
+
+    // Next button
+    document.getElementById('next-btn').addEventListener('click', nextQuestion);
+    
+    // Timer toggle button
+    document.getElementById('timer-toggle-btn').addEventListener('click', toggleTimer);
+    
+    // Restart button
+    document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+}
+
+// ====== PARTİCLE SİSTEMİ ======
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.animationDelay = `${Math.random() * 20}s`;
+        particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+        particle.style.opacity = Math.random() * 0.5 + 0.3;
+        particle.style.width = particle.style.height = `${Math.random() * 6 + 2}px`;
+        particlesContainer.appendChild(particle);
+    }
+}
+
+// ====== PROGRESS CIRCLES ======
+function createProgressCircles() {
+    const totalQuestions = allQuestions.length;
+    progressCircles.innerHTML = '';
+    for (let i = 0; i < totalQuestions; i++) {
+        const circle = document.createElement('div');
+        circle.className = 'progress-circle';
+        circle.id = `circle-${i}`;
+        progressCircles.appendChild(circle);
+    }
+}
+
+function updateProgressCircles() {
+    const circles = document.querySelectorAll('.progress-circle');
+    circles.forEach((circle, index) => {
+        circle.classList.remove('active');
+        if (index === currentQuestionIndex) {
+            circle.classList.add('active');
+        }
+        
+        // Əvvəlki cavabları rənglə
+        if (userAnswers[index]) {
+            if (userAnswers[index].correct) {
+                circle.classList.add('correct');
+                circle.classList.remove('incorrect');
+            } else {
+                circle.classList.add('incorrect');
+                circle.classList.remove('correct');
+            }
+        }
+    });
+}
+
+// ====== TIMER FUNCTIONS ======
+function resetTimer() {
+    stopTimer();
+    timeLeft = totalTime;
+    timerDisplayElement.textContent = `${timeLeft}s`;
+    timerBarElement.style.width = '100%';
+    startTimer();
+}
+
+function startTimer() {
+    if (timerInterval) return;
+    isTimerPaused = false;
+    timerToggleBtn.innerHTML = '<i class="fas fa-pause"></i>';
+
+    timerInterval = setInterval(() => {
+        if (!isTimerPaused) {
+            timeLeft--;
+            timerDisplayElement.textContent = `${timeLeft}s`;
+            timerBarElement.style.width = `${(timeLeft / totalTime) * 100}%`;
+
+            if (timeLeft <= 0) {
+                handleAnswer(null, allQuestions[currentQuestionIndex].correct_answer, null);
+            }
+        }
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+}
+
+function toggleTimer() {
+    if (isTimerPaused) {
+        isTimerPaused = false;
+        timerToggleBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        startTimer();
+    } else {
+        isTimerPaused = true;
+        timerToggleBtn.innerHTML = '<i class="fas fa-play"></i>';
+        stopTimer();
+    }
+}
+
+// ====== QUIZ FUNCTIONS ======
+function loadQuestion(questionIndex) {
+    console.log('Loading question:', questionIndex);
+    
+    clearTimeout(autoNextTimeout);
+    autoNextMessage.style.display = 'none';
+    
+    if (questionIndex >= allQuestions.length) {
+        showResult();
+        return;
+    }
+
+    const currentQuestion = allQuestions[questionIndex];
+    
+    questionElement.innerHTML = `<span style="color: var(--accent-pink);">${currentQuestion.question_number}.</span> ${currentQuestion.question_text}`;
+    progressElement.textContent = `Sual ${questionIndex + 1} / ${allQuestions.length}`;
+    questionCounterElement.textContent = `${questionIndex + 1} / ${allQuestions.length}`;
+
+    optionsContainer.innerHTML = '';
+    nextBtn.style.display = 'none';
+
+    const optionLetters = ['a', 'b', 'c', 'd'];
+    optionLetters.forEach((letter) => {
+        const optionText = currentQuestion.options[letter];
+        if (optionText) {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            button.dataset.answer = letter;
+            button.innerHTML = `<span class="option-letter">${letter.toUpperCase()}</span> ${optionText}`;
+            
+            button.addEventListener('click', () => handleAnswer(letter, currentQuestion.correct_answer, button));
+            
+            optionsContainer.appendChild(button);
+        }
+    });
+
+    resetTimer();
+    updateProgressCircles();
+}
+
+function handleAnswer(selectedAnswer, correctAnswer, selectedButton) {
+    stopTimer();
+    
+    Array.from(optionsContainer.children).forEach(btn => {
+        btn.disabled = true;
+    });
+    
+    let isCorrect = selectedAnswer === correctAnswer;
+
+    userAnswers.push({
+        question: allQuestions[currentQuestionIndex].question_number,
+        correct: isCorrect,
+        userAnswer: selectedAnswer
+    });
+
+    // Cavabları rənglə
+    Array.from(optionsContainer.children).forEach(btn => {
+        const letter = btn.dataset.answer;
+        if (letter === correctAnswer) {
+            btn.classList.add('correct');
+        } else if (letter === selectedAnswer && letter !== correctAnswer) {
+            btn.classList.add('incorrect');
+        }
+    });
+
+    // Avtomatik növbəti suala keçid
+    autoNextMessage.textContent = isCorrect ? "✅ Düzgün cavab! Növbəti suala keçir..." : "❌ Yanlış cavab! Növbəti suala keçir...";
+    autoNextMessage.style.display = 'block';
+    autoNextMessage.style.color = isCorrect ? 'var(--accent-green)' : 'var(--accent-pink)';
+    
+    autoNextTimeout = setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+    
+    // Progress circles yenilə
+    updateProgressCircles();
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < allQuestions.length) {
+        loadQuestion(currentQuestionIndex);
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    stopTimer();
+    clearTimeout(autoNextTimeout);
+    quizHeader.style.display = 'none';
+    quizContainer.style.display = 'none';
+    resultContainer.style.display = 'block';
+
+    const correctCount = userAnswers.filter(a => a.correct).length;
+    const totalQuestions = allQuestions.length;
+    const percentage = ((correctCount / totalQuestions) * 100).toFixed(1);
+    
+    // Skor
+    document.getElementById('score').innerHTML = `
+        <div style="font-size: 1.8rem; color: var(--secondary-blue); margin-bottom: 10px;">
+            ${userName}
+        </div>
+        <div style="font-size: 1.3rem; color: var(--accent-pink); margin-bottom: 15px;">
+            ${totalQuestions} sualdan ${correctCount} düzgün
+        </div>
+        <div style="font-size: 3rem; color: var(--primary-blue); font-weight: 800;">
+            ${percentage}%
+        </div>
+    `;
+    
+    // Statistika
+    let statsHTML = `
+        <div style="margin-bottom: 15px;">
+            <i class="fas fa-check-circle" style="color: var(--accent-green); margin-right: 10px;"></i>
+            <strong>Düzgün cavablar:</strong> ${correctCount}
+        </div>
+        <div style="margin-bottom: 15px;">
+            <i class="fas fa-times-circle" style="color: var(--accent-pink); margin-right: 10px;"></i>
+            <strong>Yanlış cavablar:</strong> ${totalQuestions - correctCount}
+        </div>
+        <div style="margin-bottom: 15px;">
+            <i class="fas fa-percentage" style="color: var(--primary-blue); margin-right: 10px;"></i>
+            <strong>Uğur faizi:</strong> ${percentage}%
+        </div>
+    `;
+    
+    if (percentage >= 80) {
+        statsHTML += `
+            <div style="margin-top: 20px; padding: 15px; background: rgba(6, 214, 160, 0.1); border-radius: 10px; border-left: 4px solid var(--accent-green);">
+                <i class="fas fa-trophy" style="color: var(--accent-yellow); margin-right: 10px;"></i>
+                <strong>ƏLA NƏTİCƏ!</strong> Təbriklər!
+            </div>
+        `;
+    } else if (percentage >= 60) {
+        statsHTML += `
+            <div style="margin-top: 20px; padding: 15px; background: rgba(67, 97, 238, 0.1); border-radius: 10px; border-left: 4px solid var(--primary-blue);">
+                <i class="fas fa-star" style="color: var(--accent-yellow); margin-right: 10px;"></i>
+                <strong>YAXŞI NƏTİCƏ!</strong> Davam edin!
+            </div>
+        `;
+    }
+    
+    statsDetails.innerHTML = statsHTML;
+}
+
+function restartQuiz() {
+    currentQuestionIndex = 0;
+    userAnswers = [];
+    
+    startContainer.style.display = 'none';
+    quizHeader.style.display = 'grid';
+    quizContainer.style.display = 'block';
+    resultContainer.style.display = 'none';
+    
+    document.getElementById('username-display').textContent = userName;
+    loadQuestion(currentQuestionIndex);
+    createProgressCircles();
+}
+
+// ====== KEYBOARD CONTROLS ======
+document.addEventListener('keydown', (e) => {
+    if (!quizContainer.style.display || quizContainer.style.display === 'none') return;
+    
+    // 1-4 rəqəmləri ilə cavab seçmək
+    if (e.key >= '1' && e.key <= '4') {
+        const index = parseInt(e.key) - 1;
+        const buttons = document.querySelectorAll('.option-btn');
+        if (buttons[index] && !buttons[index].disabled) {
+            const answer = buttons[index].dataset.answer;
+            const correctAnswer = allQuestions[currentQuestionIndex].correct_answer;
+            buttons[index].click();
+        }
+    }
+    
+    // Space - taymeri dayandır/davam et
+    if (e.key === ' ') {
+        e.preventDefault();
+        toggleTimer();
+    }
+    
+    // Enter - növbəti suala keç
+    if (e.key === 'Enter' && nextBtn.style.display !== 'none') {
+        nextBtn.click();
+    }
+    
+    // N - növbəti suala keç
+    if (e.key === 'n' || e.key === 'N') {
+        if (nextBtn.style.display !== 'none') {
+            nextBtn.click();
+        }
+    }
+});
+    </script>
+</body>
+
+</html>
