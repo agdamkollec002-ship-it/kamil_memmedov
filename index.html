@@ -434,67 +434,108 @@
         </footer>
     </div>
 
-    <script>
-        // Elementlər
-        const messageBox = document.getElementById('messageBox');
-        const messageText = document.getElementById('messageText');
-        const loadingIndicator = document.getElementById('loadingIndicator');
+   <script>
+    // Elementlər
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+    const loadingIndicator = document.getElementById('loadingIndicator');
 
-        // Mesaj göstərmə
-        function showMessage(text, isError = false) {
-            messageText.textContent = text;
-            messageBox.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ' + 
-                                     (isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white');
-            messageBox.classList.remove('hidden');
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 4000);
+    // Mesaj göstərmə
+    function showMessage(text, isError = false) {
+        messageText.textContent = text;
+        messageBox.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ' + 
+                                 (isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white');
+        messageBox.classList.remove('hidden');
+        setTimeout(() => {
+            messageBox.classList.add('hidden');
+        }, 4000);
+    }
+
+    // Yükləmə göstəricisi
+    function showLoading(show) {
+        if (loadingIndicator) {
+            loadingIndicator.classList.toggle('hidden', !show);
         }
+    }
 
-        // Yükləmə göstəricisi
-        function showLoading(show) {
-            if (loadingIndicator) {
-                loadingIndicator.classList.toggle('hidden', !show);
-            }
-        }
+    // Scroll animasiyaları
+    function initScrollAnimations() {
+        const revealElements = document.querySelectorAll('.scroll-reveal');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        });
+        
+        revealElements.forEach(element => {
+            observer.observe(element);
+        });
+    }
 
-        // Scroll animasiyaları
-        function initScrollAnimations() {
-            const revealElements = document.querySelectorAll('.scroll-reveal');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -100px 0px'
+    // Statistika containerinə klik eventi əlavə et
+    document.addEventListener('DOMContentLoaded', function() {
+        // Statistika containerini tap (Fənnlərimiz bölməsindəki Statistika kartı)
+        const statistikaContainer = document.querySelector('a[href="index.html"]');
+        
+        if (statistikaContainer) {
+            statistikaContainer.addEventListener('click', function(e) {
+                e.preventDefault(); // Default davranışı dayandır
+                
+                // Yükləmə göstəricisini göstər
+                showLoading(true);
+                
+                // 500ms gözlə və statistika.html səhifəsinə yönləndir
+                setTimeout(() => {
+                    window.location.href = "statistika.html";
+                }, 500);
             });
             
-            revealElements.forEach(element => {
-                observer.observe(element);
+            // Hover effekti üçün CSS class əlavə et
+            statistikaContainer.style.cursor = 'pointer';
+            statistikaContainer.classList.add('hover:scale-105', 'transition-transform', 'duration-300');
+        }
+        
+        // Əlavə olaraq, "Statistika Fənninə Keçid" düyməsi üçün də eyni funksionallıq
+        const statistikaButton = document.querySelector('a[href="statistika.html"]');
+        
+        if (statistikaButton) {
+            statistikaButton.addEventListener('click', function(e) {
+                e.preventDefault(); // Default davranışı dayandır
+                
+                // Yükləmə göstəricisini göstər
+                showLoading(true);
+                
+                // 500ms gözlə və statistika.html səhifəsinə yönləndir
+                setTimeout(() => {
+                    window.location.href = "statistika.html";
+                }, 500);
             });
         }
+    });
 
-        // Sayt yükləndikdə
-        window.onload = function() {
-            // Scroll animasiyalarını başlat
-            initScrollAnimations();
-            
-            // Background circles animasiyası
-            const circles = document.querySelectorAll('.circle');
-            circles.forEach((circle, index) => {
-                circle.style.animationDelay = `${index * 2}s`;
-            });
-            
-            // Birbaşa giriş mesajı
-            setTimeout(() => {
-                showMessage("Xoş gəldiniz! Statistika fənninə birbaşa daxil ola bilərsiniz.", false);
-            }, 1000);
-        };
-    </script>
+    // Sayt yükləndikdə
+    window.onload = function() {
+        // Scroll animasiyalarını başlat
+        initScrollAnimations();
+        
+        // Background circles animasiyası
+        const circles = document.querySelectorAll('.circle');
+        circles.forEach((circle, index) => {
+            circle.style.animationDelay = `${index * 2}s`;
+        });
+        
+        // Birbaşa giriş mesajı
+        setTimeout(() => {
+            showMessage("Xoş gəldiniz! Statistika fənninə birbaşa daxil ola bilərsiniz.", false);
+        }, 1000);
+    };
+</script>
 </body>
 
 </html>
